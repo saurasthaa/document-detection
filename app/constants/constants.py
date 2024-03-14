@@ -1,5 +1,6 @@
-import cv2
 from pathlib import Path
+
+import cv2
 
 MODEL_PATH = "model/best.pt"
 
