@@ -5,7 +5,7 @@ import cv2
 from ultralytics import YOLO
 import torch
 
-from app.constants.constants import *
+from app.constants.constants import MODEL_PATH
 from app.utils.commons import (generate_random_id,
                                get_image_crops, save_image)
 
