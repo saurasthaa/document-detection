@@ -11,32 +11,61 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def generate_random_id():
+def create_directory(dir_path: str) -> None:
+    """
+    Creates a directory if it does not exist.
+
+    Args:
+        dir_path (str): The path of the directory to be created.
+
+    Returns:
+        None
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        print(f"Directory Created: {dir_path}")
+
+
+def generate_random_id() -> str:
+    """
+    Generates a random ID consisting of alphanumeric characters.
+
+    Returns:
+        str: A random alphanumeric ID of length 10.
+    """
     characters = string.ascii_letters + string.digits
     random_id = "".join(random.choice(characters) for i in range(10))
     return random_id
 
 
-def move_images(source_directory):
+def move_images(source_directory: str) -> None:
+    """
+    Moves all .jpg files from the source directory to a subdirectory named with the current timestamp.
+
+    Args:
+        source_directory (str): The path to the source directory containing .jpg files.
+
+    Returns:
+        None
+    """
     # Create a subdirectory with the current timestamp
     current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     destination_directory = os.path.join(source_directory, current_time)
     files_to_move = glob.glob(f"{source_directory}/*.jpg")
 
-    try:
-        os.mkdir(destination_directory)
-        print(f"Created directory: {destination_directory}")
-    except OSError as e:
-        print(f"Error creating directory: {e}")
-        return
+    if files_to_move:
+        create_directory(destination_directory)
 
-    # Move each file to the destination directory
-    for file_path in files_to_move:
-        file_name = os.path.basename(file_path)
-        destination_path = os.path.join(destination_directory, file_name)
-        print(destination_path)
-        shutil.move(file_path, destination_path)
-        print(f"Moving: {file_name} to {destination_directory}")
+        # Move each file to the destination directory
+        for file_path in files_to_move:
+            file_name = os.path.basename(file_path)
+            destination_path = os.path.join(destination_directory, file_name)
+            print(destination_path)
+            shutil.move(file_path, destination_path)
+            print(f"Moving: {file_name} to {destination_directory}")
+    else:
+        print("No images found.")
+        return
 
 
 def save_image(
