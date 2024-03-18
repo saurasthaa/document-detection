@@ -68,15 +68,21 @@ def detect_document(video_path, meeting_id):
 
         logging.info(f"========== Response ==========\n{response}")
 
-        return response
-
-        # response = requests.post(os.environ.get(
-        #     "MIKHA_URI"), data=results, headers=headers)
-        # logging.info(
-        #     f"Response code: {response.status_code}\nResponse msg: {response.content}")
-
     except Exception as e:
         logging.error(e)
+        response = DocumentAnalysisResponse(
+            message=e,
+            meeting_id=meeting_id,
+            file_paths=[],
+            time_taken=round(end_time - start_time, 2),
+        )
+
+    return response
+
+    # response = requests.post(os.environ.get(
+    #     "MIKHA_URI"), data=results, headers=headers)
+    # logging.info(
+    #     f"Response code: {response.status_code}\nResponse msg: {response.content}")
 
 
 @app.post("/video-process")

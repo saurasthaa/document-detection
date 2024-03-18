@@ -12,7 +12,11 @@ from app.utils.commons import (generate_random_id,
 detect_model_path: str = os.path.join(
     os.path.dirname(__file__), "..", MODEL_PATH)
 
-model = YOLO(detect_model_path)
+try:
+    model = YOLO(detect_model_path)
+except:
+    raise RuntimeError(
+        "Model has not been loaded. Please check the model path.")
 
 
 def detect(video_path: str, image_save_path: str) -> Union[List, int]:
@@ -30,38 +34,45 @@ def detect(video_path: str, image_save_path: str) -> Union[List, int]:
         FileNotFoundError: If the specified video file is not found.
         Exception: If an unexpected error occurs during processing.
     """
-    i = 0
-    cap = cv2.VideoCapture(video_path)
+
+    try:
+        cap = cv2.VideoCapture(video_path)
+    except Exception:
+        raise FileNotFoundError("Video file not found")
 
     documents = []
+    i = 0
 
-    while True:
-        ret, frame = cap.read()
+    try:
+        while True:
+            ret, frame = cap.read()
 
-        if (i + 1) % 50 == 0:
-            result = model.predict(frame)
-            boxes = result[0].boxes
+            if (i + 1) % 50 == 0:
+                result = model.predict(frame)
+                boxes = result[0].boxes
 
-            if boxes:
-                for box in boxes:
-                    c = box.cls
-                    if c.item() == 0:
-                        predicted_bbox = box.xyxy[0].round().to(
-                            torch.int).tolist()
-                        doc = get_image_crops(frame, [predicted_bbox])[0]
-                        documents.append(doc)
+                if boxes:
+                    for box in boxes:
+                        c = box.cls
+                        if c.item() == 0:
+                            predicted_bbox = box.xyxy[0].round().to(
+                                torch.int).tolist()
+                            doc = get_image_crops(frame, [predicted_bbox])[0]
+                            documents.append(doc)
 
-        i += 1
+            i += 1
 
-        if not ret:
-            break
-
-    cap.release()
+            if not ret:
+                break
+    except Exception:
+        raise Exception(
+            "An unexpected error occured during the processing of the video.")
+    finally:
+        cap.release()
 
     if documents:
         file_name = image_save_path + "/" + generate_random_id()
         file_paths = save_image(documents, file_name)
         return file_paths
     else:
-        print("here")
         return 0

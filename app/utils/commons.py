@@ -22,8 +22,11 @@ def create_directory(dir_path: str) -> None:
         None
     """
     if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-        print(f"Directory Created: {dir_path}")
+        try:
+            os.makedirs(dir_path)
+            print(f"Directory Created: {dir_path}")
+        except Exception:
+            raise Exception(f"{dir_path} could not be created.")
 
 
 def generate_random_id() -> str:
